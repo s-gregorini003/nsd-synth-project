@@ -9,13 +9,16 @@
 
 #ifndef SOUNDCOMPONENT_H_INCLUDED
 #define SOUNDCOMPONENT_H_INCLUDED
-#include "SquareVoice.h"
+#include "SynthVoice.h"
+
+
 
 //==============================================================================
 class MainComponent   : public Component,
 						public AudioIODeviceCallback,
 						public MidiInputCallback,
 						public Button::Listener
+					//	private MidiKeyboardStateListener
 						//public Slider::Listener
 	
 {
@@ -25,26 +28,59 @@ public:
 		midiKeyboardComponent(midiKeyboardState, MidiKeyboardComponent::Orientation::horizontalKeyboard)
 	
 	{
-		audioDeviceManager.initialiseWithDefaultDevices(0, 2);
+		synth.clearVoices();
+		audioDeviceManager.initialise(0, 2, nullptr, true, String(), nullptr);
 		audioDeviceManager.addMidiInputCallback(String::empty, this);
 		audioDeviceManager.addAudioCallback(this);
 
 		StringArray devices = MidiInput::getDevices();
-		for (int i = 0; i < devices.size(); ++i)
+
+
+		for (int i = 0; i < devices.size(); ++i) {
 			audioDeviceManager.setMidiInputEnabled(devices[i], true);
 
+			}
+
+		audioDeviceManager.addMidiInputCallback(String(), this);
 		midiKeyboardState.addListener(&midiCollector);
 
-		synth.addSound(new SquareSound());
+		synth.clearSounds();
+		synth.addSound(new SynthSound());
 
 		for (int i = 0; i < maxNumVoices; ++i)
 		{
-			synth.addVoice(new SquareVoice());
+			synth.addVoice(new SynthVoice());
 		}
+
 
 		addAndMakeVisible(midiKeyboardComponent);
 
 		masterPower = true;
+
+		addAndMakeVisible(squareOscButton1);
+		squareOscButton1.setClickingTogglesState(true);
+		squareOscButton1.setToggleState(true, dontSendNotification);
+		squareOscButton1.setButtonText("square");
+		squareOscButton1.addListener(this);
+
+		addAndMakeVisible(sineOscButton1);
+		sineOscButton1.setClickingTogglesState(true);
+		sineOscButton1.setToggleState(false, dontSendNotification);
+		sineOscButton1.setButtonText("sine");
+		sineOscButton1.addListener(this);
+
+		addAndMakeVisible(squareOscButton2);
+		squareOscButton2.setClickingTogglesState(true);
+		squareOscButton2.setToggleState(true, dontSendNotification);
+		squareOscButton2.setButtonText("square");
+		squareOscButton2.addListener(this);
+
+		addAndMakeVisible(sineOscButton2);
+		sineOscButton2.setClickingTogglesState(true);
+		sineOscButton2.setToggleState(false, dontSendNotification);
+		sineOscButton2.setButtonText("sine");
+		sineOscButton2.addListener(this);
+
 
 		
 
@@ -82,6 +118,11 @@ public:
 		juce::Rectangle<int> r = getLocalBounds();
 		midiKeyboardComponent.setBounds(r.removeFromBottom(8 * margin));
 
+		squareOscButton1.setBounds(30, 30, 100, 20);
+		sineOscButton1.setBounds(180, 30, 100, 20);
+		squareOscButton2.setBounds(30, 70, 100, 20);
+		sineOscButton2.setBounds(180, 70, 100, 20);
+
 	}
 
 	//===============================================================================
@@ -113,19 +154,68 @@ public:
 	}
 
 	//===============================================================================
-	void handleIncomingMidiMessage(MidiInput *source, const MidiMessage &message) override
+	void handleIncomingMidiMessage(MidiInput* /*source*/, const MidiMessage &message) override
 	{
 		midiCollector.addMessageToQueue(message);
+		
 	}
 
 	//===============================================================================
 	void buttonClicked(Button *buttonThatWasClicked)
 	{
-		/*if (buttonThatWasClicked == &squareOsc) {
-			sineOsc.setToggleState(true, dontSendNotification);
+		if (buttonThatWasClicked == &squareOscButton1) {
+			squareOscButton1.setState(Button::buttonDown);
+			sineOscButton1.setState(Button::buttonNormal);
+			sineOscButton1.setToggleState(false, dontSendNotification);
+			int square = 1;
+			for (int i = 0; i < maxNumVoices; ++i)
+			{
+				synth.getVoice(i)->controllerMoved(100, (int) (square) );
 
-			testVoice.setOscillator(1);
-		}*/
+				DBG("squareButton1 pressed");
+			}
+			
+		}
+
+		else if (buttonThatWasClicked == &sineOscButton1) {
+			squareOscButton1.setToggleState(false, dontSendNotification);
+			sineOscButton1.setState(Button::buttonDown);
+			squareOscButton1.setState(Button::buttonNormal);
+			int sine = 2;
+			for (int i = 0; i < maxNumVoices; ++i)
+			{
+				synth.getVoice(i)->controllerMoved(100, (int) (sine) );
+
+				DBG("sineButton1 pressed");
+			}
+		}
+
+		if (buttonThatWasClicked == &squareOscButton2) {
+			squareOscButton2.setState(Button::buttonDown);
+			sineOscButton2.setState(Button::buttonNormal);
+			sineOscButton2.setToggleState(false, dontSendNotification);
+			int square = 1;
+			for (int i = 0; i < maxNumVoices; ++i)
+			{
+				synth.getVoice(i)->controllerMoved(101, (int)(square));
+
+				DBG("squareButton2 pressed");
+			}
+
+		}
+
+		else if (buttonThatWasClicked == &sineOscButton2) {
+			squareOscButton2.setToggleState(false, dontSendNotification);
+			sineOscButton2.setState(Button::buttonDown);
+			squareOscButton2.setState(Button::buttonNormal);
+			int sine = 2;
+			for (int i = 0; i < maxNumVoices; ++i)
+			{
+				synth.getVoice(i)->controllerMoved(101, (int)(sine));
+
+				DBG("sineButton2 pressed");
+			}
+		}
 	}
 
 	//===============================================================================
@@ -134,19 +224,28 @@ public:
 		
 	}
 
+	
+	//===============================================================================
+
+
 private:
 
+	//===============================================================================
+	
+		
 	AudioDeviceManager audioDeviceManager;
 	Synthesiser synth;
 	MidiMessageCollector midiCollector;
 	MidiKeyboardState midiKeyboardState;
 	MidiKeyboardComponent midiKeyboardComponent;
 	const int maxNumVoices = 16;
-	//SquareVoice testVoice;
 
+	MidiInputCallback* midiInputCallback;
+
+	
+	TextButton squareOscButton1, squareOscButton2, sineOscButton1, sineOscButton2;
 	bool masterPower;
-	//TextButton squareOsc;
-	//TextButton sineOsc;
+
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };
