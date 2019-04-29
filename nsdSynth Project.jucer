@@ -3,12 +3,12 @@
 <JUCERPROJECT id="ZeDa3r" name="nsdSynth Project" projectType="guiapp" jucerVersion="5.4.3">
   <MAINGROUP id="QA4DZm" name="nsdSynth Project">
     <GROUP id="{6B5D65C9-3639-2E4B-CD03-A0C258A2EED8}" name="Source">
-      <FILE id="BD4fCW" name="ADSREnv.h" compile="0" resource="0" file="Source/ADSREnv.h"/>
-      <FILE id="XE5RxI" name="SquareOsc.h" compile="0" resource="0" file="Source/SquareOsc.h"/>
-      <FILE id="Lkj9ZJ" name="SineVoice.h" compile="0" resource="0" file="Source/SineVoice.h"/>
-      <FILE id="jDOg2L" name="SquareVoice.h" compile="0" resource="0" file="Source/SquareVoice.h"/>
       <FILE id="SZ9vGP" name="MainComponent.h" compile="1" resource="0" file="Source/MainComponent.h"/>
       <FILE id="VrlS85" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
+      <FILE id="nOBfeg" name="SynthVoice.h" compile="0" resource="0" file="Source/SynthVoice.h"/>
+      <FILE id="pgwyqz" name="Osc.h" compile="0" resource="0" file="Source/Osc.h"/>
+      <FILE id="v1srAY" name="Filter.h" compile="0" resource="0" file="Source/Filter.h"/>
+      <FILE id="lz3YV6" name="Filter.cpp" compile="1" resource="0" file="Source/Filter.cpp"/>
       <GROUP id="{D8FFEA3D-93AC-0CB3-0887-6332CBFE89AC}" name="Maximilian">
         <GROUP id="{71D2DF57-1376-423B-1053-FB433509BEA2}" name="libs">
           <FILE id="vb2fp0" name="fft.cpp" compile="1" resource="0" file="../../Libraries/Maximilian/libs/fft.cpp"/>

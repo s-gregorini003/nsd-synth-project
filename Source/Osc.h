@@ -17,9 +17,9 @@ class Osc
 {
 public:
 	Osc() {
-		oscFreq = 100.;
+		oscFreq = 0.;
 		sampleRate = 44100.;
-		signal = myOsc.sinewave(oscFreq);
+		//signal = myOsc.sinewave(oscFreq);
 	}
 
 	~Osc() {
@@ -48,6 +48,7 @@ public:
 		1 = Square Wave
 		2 = Sine Wave
 		3 = Saw Wave
+		4 = Pulse wave
 		*/
 		if (wave == 1) {
 			signal = myOsc.square(oscFreq);
@@ -55,6 +56,14 @@ public:
 
 		if (wave == 2) {
 			signal = myOsc.sinewave(oscFreq);
+		}
+
+		if (wave == 3) {
+			signal = myOsc.saw(oscFreq);
+		}
+
+		if (wave == 4) {
+			signal = myOsc.pulse(oscFreq, duty);
 		}
 	}
 
@@ -74,6 +83,7 @@ private:
 	double oscFreq;
 	double sampleRate;
 	double signal;
+	double duty = 0.5;
 };
 
 #endif //OSC_H_INCLUDED
