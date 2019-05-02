@@ -59,7 +59,7 @@ public:
 		masterPower = true;
 
 		//==============================================================================
-
+		/*
 		//Buttons initialisation
 		squareOscButton1.setClickingTogglesState(true);
 		squareOscButton1.setToggleState(true, dontSendNotification);
@@ -84,7 +84,7 @@ public:
 		sineOscButton2.setButtonText("sine");
 		sineOscButton2.addListener(this);
 		addAndMakeVisible(sineOscButton2);
-
+		*/
 		//==============================================================================
 
 		//ComboBoxes initialisation
@@ -97,6 +97,16 @@ public:
 		wavesOsc1.setSelectedId(1);
 		wavesOsc1.addListener(this);
 		addAndMakeVisible(wavesOsc1);
+
+		wavesOsc2.setEditableText(false);
+		wavesOsc2.addItem("square", 1);
+		wavesOsc2.addItem("sine", 2);
+		wavesOsc2.addItem("saw", 3);
+		wavesOsc2.addItem("pulse", 4);
+		wavesOsc2.setJustificationType(Justification::centred);
+		wavesOsc2.setSelectedId(1);
+		wavesOsc2.addListener(this);
+		addAndMakeVisible(wavesOsc2);
 
 		filterTypeMenu.setEditableText(false);
 		filterTypeMenu.addItem("none", 1);
@@ -207,12 +217,15 @@ public:
 		juce::Rectangle<int> r = getLocalBounds();
 		midiKeyboardComponent.setBounds(r.removeFromBottom(8 * margin));
 
+		/*
 		squareOscButton1.setBounds(30, 30, 100, 20);
 		sineOscButton1.setBounds(180, 30, 100, 20);
 		squareOscButton2.setBounds(30, 70, 100, 20);
 		sineOscButton2.setBounds(180, 70, 100, 20);
+*/
 
-		wavesOsc1.setBounds(500, 300, 200, 40);
+		wavesOsc1.setBounds(500, 300, 100, 20);
+		wavesOsc2.setBounds(500, 360, 100, 20);
 
 		attack.setBounds(500, 50, 20, 150);
 		decay.setBounds(540, 50, 20, 150);
@@ -266,7 +279,8 @@ public:
 
 	//===============================================================================
 	void buttonClicked(Button *buttonThatWasClicked)
-	{
+	{ 
+		/*
 		if (buttonThatWasClicked == &squareOscButton1) {
 			squareOscButton1.setState(Button::buttonDown);
 			sineOscButton1.setState(Button::buttonNormal);
@@ -323,7 +337,7 @@ public:
 
 				DBG("sineButton2 pressed");
 			}
-		}
+		}*/
 	}
 
 	//===============================================================================
@@ -417,18 +431,17 @@ public:
 	void comboBoxChanged(ComboBox * comboBoxThatHasChanged)
 	{
 
-		if (filterTypeMenu.getSelectedId() == 1) {
-
-			int filterType = 1;
+		if (&filterTypeMenu) {
 
 			for (int i = 0; i < maxNumVoices; ++i)
 			{
-				synth.getVoice(i)->controllerMoved(106, (int)filterType);
+				synth.getVoice(i)->controllerMoved(106, filterTypeMenu.getSelectedId());
 
 				DBG("No filter selected");
 			}
 		}
 
+		/*
 		else if (filterTypeMenu.getSelectedId() == 2) {
 
 			int filterType = 2;
@@ -463,20 +476,19 @@ public:
 
 				DBG("Band pass filter selected");
 			}
-		}
+		}*/
 
-		if (lfoDestMenu.getSelectedId() == 1) {
-
-			int lfoDest = 1;
+		if (&lfoDestMenu) {
 
 			for (int i = 0; i < maxNumVoices; ++i)
 			{
-				synth.getVoice(i)->controllerMoved(109, (int)lfoDest);
+				synth.getVoice(i)->controllerMoved(109, lfoDestMenu.getSelectedId());
 
-				DBG("No LFO selected");
+				DBG("LFO selected");
 			}
 		}
 
+		/*
 		else if (lfoDestMenu.getSelectedId() == 2) {
 
 			int lfoDest = 2;
@@ -499,6 +511,24 @@ public:
 
 				DBG("Cutoff LFO selected");
 			}
+		}*/
+
+		if (&wavesOsc1) {
+
+			for (int i = 0; i < maxNumVoices; ++i)
+			{
+				synth.getVoice(i)->controllerMoved(100, wavesOsc1.getSelectedId());
+
+			}
+		}
+
+		if (&wavesOsc2) {
+
+			for (int i = 0; i < maxNumVoices; ++i)
+			{
+				synth.getVoice(i)->controllerMoved(101, wavesOsc2.getSelectedId());
+
+			}
 		}
 	}
 
@@ -518,7 +548,7 @@ private:
 	MidiInputCallback* midiInputCallback;
 
 	
-	TextButton squareOscButton1, squareOscButton2, sineOscButton1, sineOscButton2;
+	//TextButton squareOscButton1, squareOscButton2, sineOscButton1, sineOscButton2;
 	ComboBox wavesOsc1, wavesOsc2, filterTypeMenu, lfoDestMenu;
 	Slider attack, decay, sustain, release, cutoffFreq, resonance, lfoRate, lfoDepth;
 
